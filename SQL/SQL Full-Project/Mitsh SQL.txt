@@ -1,0 +1,44 @@
+SELECT * FROM admin.councils
+LIMIT 10
+////////////////////////////////////
+set search_path to admin , public;
+
+SELECT * FROM councils;
+SELECT name , geom From councils limit 6  ; // can show jsut what i need to see with limited lines
+SELECT lower (name ), geom From councils limit 6; // aplied function to get all nmes in lwer case 
+SELECT lower (name ), st_astext(geom) From councils limit 6;// aplied another function to get geom as text converted into more readable text 
+SELECT lower (name ), round (st_area(geom)/1000000)as "Area " From councils limit 6; //show area in gemo and in square kilo miter 
+order by "Area" desc
+/// //can write also in this shape to compare betweeen two queries 
+SELECT upper (name ), round (st_area(geom)/1000000)as "Area " 
+From councils
+where name like'C%'
+order by "Area" desc
+////////////////////////////////////////////////using map now 
+
+set search_path to map , public;
+SELECT * FROM roads limit 6  ;
+select distinct (classifica) from roads;      // show uniqu road names .. shoes there are 13 uniqu road names 
+select left (classifica,6) st_length (geom )from roads limit 10;
+select round(sum (st_length(geom))/1000) as "TOTAL"
+from roads;
+				  // do some changes
+
+select left (classifica,6) as "TYPE ", round(sum (st_length (geom))/1000) as "TOTAL" 
+from roads
+group by left(classifica,6)										  
+order by "TOTAL" Desc
+		/////////////////////////
+set search_path to admin,public
+select sum(a.totadult) as "at risk"
+from admin.oas_centroids_stats as a
+join environ.floodwarning as b
+on st_contains(b.geom,a.geom)
+//////////////////////////////////
+select postcode,population,distname as station 
+from admin.postcode_3 as a join map.railwaystations as b 
+on st_dwithin (a.geom,b.geom,100)
+//////////////////////////
+select postcode,population 
+from admin.postcode_3 as a join environ.floodwarning as b 
+on st_dwithin (a.geom,b.geom,100)		  		

@@ -1,0 +1,5 @@
+
+select left (site_name,20) as "Name ", round(sum (st_length (geom))/1000) as "TOTAL" 
+from historic_landfills
+group by left(site_name,20)										  
+order by "TOTAL" Asc
